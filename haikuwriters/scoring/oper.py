@@ -1,33 +1,20 @@
 from haikuwriters.scoring.tree import ScoreTree, ScoreTerm
 
 
-class Operation:
-    operator = None
-    def draw(self, *operands:ScoreTree):
-        return type(self).__name__ + str(tuple(operands))
-
-
-class Combinator(ScoreTree):
-    def __init__(self, op:Operation, *children:ScoreTree):
-        super().__init__(str(op), children)
-
-    def __str__(self):
-        return "(" + self.operation.draw(self.left, self.right) + ")"
-
-
-class BinaryOperation(Combinator):
-    def __init__(self, left:ScoreTree, right:ScoreTree):
-        self.left = left
-        self.right = right
-        super().__init__(self.operation, left, right)
-
+### Operators ###
 
 class Operator:
     def apply(self, *operands:ScoreTree):
-        pass
+        raise NotImplementedError()
 
-    def draw(self, *operands:ScoreTree):
-        pass
+    def _wrap_str(self, *operands:ScoreTree):
+        raise NotImplementedError()
+
+    def __str__(self):
+        return ""
+
+
+NoOp = Operator()
 
 
 class InfixOperator(Operator):
@@ -38,18 +25,60 @@ class InfixOperator(Operator):
     def __str__(self):
         return self.symbol
 
-    def draw(self, left:ScoreTree, right:ScoreTree):
+    def __repr__(self):
+        return self.symbol
+
+    def _wrap_str(self, left:ScoreTree, right:ScoreTree):
         return str(left) + " " + str(self) + " " + str(right)
 
 
-class Choose(Operator):
-    def draw(self, left:ScoreTerm, right:ScoreTerm):
-        return str(left.tree) + "[" + left.meta + "%] / " + str(right.tree) + "[" + right.meta + "%]"
+class ChooseOperator(Operator):
+    def _wrap_str(self, *operands:ScoreTerm):
+        terms = [str(op.node) + " {" + str(int(op.meta * 100)) + "%}" for op in operands]
+        return " | ".join(terms)
+
+    def __str__(self):
+        return "|%"
+
+    def __repr__(self):
+        return "|%"
+
+ChooseOperator = ChooseOperator()
+
+
+### Operations ###
+
+class Operation:
+    operator = NoOp
+
+
+class Combinator(ScoreTree):
+    def __init__(self, *children:ScoreTree):
+        super().__init__(self.operator, *children)
+        # self._children = self[1:]
+
+    def __str__(self):
+        return "(" + self.operator._wrap_str(*self.children) + ")"
+
+    def __repr__(self):
+        return type(self).__name__ + "(" + ", ".join(map(repr, self.children)) + ")"
+
+
+class BinaryOperation(Combinator):
+    def __init__(self, left:ScoreTree, right:ScoreTree):
+        self.left = left
+        self.right = right
+        super().__init__(left, right)
 
 
 class Add(BinaryOperation):
-    operation = InfixOperator("+", lambda x, y: x + y)
+    operator = InfixOperator("+", lambda x, y: x + y)
 
 
 class Multiply(BinaryOperation):
-    operation = InfixOperator("*", lambda x, y: x * y)
+    operator = InfixOperator("*", lambda x, y: x * y)
+
+
+class Choose(Combinator):
+    operator = ChooseOperator
+
