@@ -19,6 +19,9 @@ class TestScoreTree(TestCase):
     def test_equal_empty_and_nil(self):
         self.assertEqual(Nil, ScoreTree(None))
 
+    def test_score_nil(self):
+        self.assertEqual(0, Nil.score)
+
 
 class TestScore(TestCase):
 
@@ -38,39 +41,57 @@ class TestScore(TestCase):
     def test_not_equal_scores(self):
         self.assertNotEqual(self.one, self.zero)
 
+    def test_score_one(self):
+        self.assertEqual(1, self.one.score)
+
 
 class TestScoreTerm(TestCase):
 
     def setUp(self):
-        self.a = ScoreTerm("a", Score(1))
-        self.x = ScoreTerm("x", Nil)
-        self.y = ScoreTerm("y", Nil)
-        self.nest_x = ScoreTerm("nest_x", self.x)
-        self.nest_y = ScoreTerm("nest_y", self.y)
+        self.a_one = ScoreTerm("a", Score(1))
+        self.x_nil = ScoreTerm("x", Nil)
+        self.y_nil = ScoreTerm("y", Nil)
+        self.nest_x = ScoreTerm("nest_x", self.x_nil)
+        self.nest_y = ScoreTerm("nest_y", self.y_nil)
 
     def test_str_nil(self):
-        self.assertEqual("x@Nil", str(self.x))
+        self.assertEqual("x@Nil", str(self.x_nil))
 
     def test_str_score(self):
-       self.assertEqual("a@1", str(self.a))
+       self.assertEqual("a@1", str(self.a_one))
 
     def test_repr_nil(self):
-        self.assertEqual("ScoreTerm('x', Nil)", repr(self.x))
+        self.assertEqual("ScoreTerm('x', Nil)", repr(self.x_nil))
 
     def test_repr_score(self):
-        self.assertEqual("ScoreTerm('a', Score(1))", repr(self.a))
+        self.assertEqual("ScoreTerm('a', Score(1))", repr(self.a_one))
 
     def test_equal_scoreterm(self):
-        self.assertEqual(self.x, self.x)
+        self.assertEqual(self.x_nil, self.x_nil)
 
     def test_not_equal_scoreterm(self):
-        self.assertNotEqual(self.x, self.y)
+        self.assertNotEqual(self.x_nil, self.y_nil)
 
     def test_equal_nested_scoreterm(self):
         self.assertEqual(self.nest_x, self.nest_x)
 
     def test_not_equal_nested_scoreterm(self):
         self.assertNotEqual(self.nest_x, self.nest_y)
+
+    def test_score_one_not_equal_scoreterm_one(self):
+        self.assertNotEqual(Score(1), self.a_one)
+
+    def test_score_nil_not_equal_scoreterm_nil(self):
+        self.assertNotEqual(Nil, self.x_nil)
+
+    def test_score_one_not_equal_scoreterm_nil(self):
+        self.assertNotEqual(Score(1), self.x_nil)
+
+    def test_scoreterm_one_score(self):
+        self.assertEqual(1, self.a_one.score)
+
+    def test_scoreterm_nil_score(self):
+        self.assertEqual(Nil.score, self.x_nil.score)
 
 
 class TestOperations(TestCase):
