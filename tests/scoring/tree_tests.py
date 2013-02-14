@@ -118,11 +118,17 @@ class TestOperations(TestCase):
     def test_equal_add(self):
         self.assertEqual(self.one_plus_one, self.one_plus_one)
 
+    def test_score_add(self):
+        self.assertEqual(2, self.one_plus_one.score)
+
     def test_str_multiply(self):
         self.assertEqual("(2 * 2)", str(self.two_times_two))
 
     def test_repr_multiply(self):
         self.assertEqual("Multiply(Score(2), Score(2))", repr(self.two_times_two))
+
+    def test_score_multiply(self):
+        self.assertEqual(4, self.two_times_two.score)
 
     def test_str_choose(self):
         self.assertEqual("(-1 {50%} | 1 {50%})", str(self.choose))
@@ -144,4 +150,3 @@ class TestOperations(TestCase):
             "Multiply(Choose(ScoreTerm(0.5, Score(-1)), ScoreTerm(0.5, Score(1))), Score(5))",
             repr(self.nested_choose)
         )
-

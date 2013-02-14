@@ -5,10 +5,10 @@ from haikuwriters.scoring.tree import ScoreTree, ScoreTerm
 
 class Operator:
     def apply(self, *operands:ScoreTree):
-        raise NotImplementedError()
+        return NotImplemented
 
     def _wrap_str(self, *operands:ScoreTree):
-        raise NotImplementedError()
+        return NotImplemented
 
     def __str__(self):
         return ""
@@ -53,15 +53,19 @@ class Operation:
 
 
 class Combinator(ScoreTree):
+
     def __init__(self, *children:ScoreTree):
         super().__init__(self.operator, *children)
-        # self._children = self[1:]
 
     def __str__(self):
         return "(" + self.operator._wrap_str(*self.children) + ")"
 
     def __repr__(self):
         return type(self).__name__ + "(" + ", ".join(map(repr, self.children)) + ")"
+
+    @property
+    def score(self):
+        return self.operator.apply(*[child.score for child in self.children])
 
 
 class BinaryOperation(Combinator):
