@@ -20,7 +20,7 @@ class TestScoreTree(TestCase):
         self.assertEqual(Nil, ScoreTree(None))
 
     def test_score_nil(self):
-        self.assertEqual(0, Nil.score)
+        self.assertEqual(0, Nil.score())
 
 
 class TestScore(TestCase):
@@ -42,7 +42,7 @@ class TestScore(TestCase):
         self.assertNotEqual(self.one, self.zero)
 
     def test_score_one(self):
-        self.assertEqual(1, self.one.score)
+        self.assertEqual(1, self.one.score())
 
 
 class TestScoreTerm(TestCase):
@@ -88,10 +88,10 @@ class TestScoreTerm(TestCase):
         self.assertNotEqual(Score(1), self.x_nil)
 
     def test_scoreterm_one_score(self):
-        self.assertEqual(1, self.a_one.score)
+        self.assertEqual(1, self.a_one.score())
 
     def test_scoreterm_nil_score(self):
-        self.assertEqual(Nil.score, self.x_nil.score)
+        self.assertEqual(Nil.score(), self.x_nil.score())
 
 
 class TestOperations(TestCase):
@@ -119,7 +119,7 @@ class TestOperations(TestCase):
         self.assertEqual(self.one_plus_one, self.one_plus_one)
 
     def test_score_add(self):
-        self.assertEqual(2, self.one_plus_one.score)
+        self.assertEqual(2, self.one_plus_one.score())
 
     def test_str_multiply(self):
         self.assertEqual("(2 * 2)", str(self.two_times_two))
@@ -128,13 +128,40 @@ class TestOperations(TestCase):
         self.assertEqual("Multiply(Score(2), Score(2))", repr(self.two_times_two))
 
     def test_score_multiply(self):
-        self.assertEqual(4, self.two_times_two.score)
+        self.assertEqual(4, self.two_times_two.score())
 
     def test_str_choose(self):
         self.assertEqual("(-1 {50%} | 1 {50%})", str(self.choose))
 
     def test_repr_choose(self):
         self.assertEqual("Choose(ScoreTerm(0.5, Score(-1)), ScoreTerm(0.5, Score(1)))", repr(self.choose))
+
+    def test_score_choose(self):
+        passed = False
+        trials = 5
+        trial_counts = []
+        trial_averages = []
+        # Try this test at most 5 times
+        for trial in range(trials):
+            counts = {
+                -1 : 0,
+                 1 : 0,
+            }
+            trial_counts.append(counts)
+            # Grab 100 scores
+            for i in range(100):
+                score = self.choose.score()
+                self.assertIn(score, counts.keys(), "Choose should select either left or right child score.")
+                counts[score] += 1
+            # Get the average count of all the chosen scores
+            avg = float(sum(counts.values()) / len(counts.values()))
+            trial_averages.append(avg)
+            # The number of times the scores are chosen should be approximately equal to the average
+            if all(count < avg + 10 for count in counts.values()):
+                passed = True
+                break
+        self.assertTrue(passed, "Improbable selection of values by Choose operation.  Averages = %s, Counts = %s" %
+                                (trial_averages, trial_counts))
 
     def test_str_nested_infix(self):
         self.assertEqual("(3 * (4 + 5))", str(self.three_times_four_plus_five))

@@ -2,7 +2,7 @@ from nltk.tree import Tree
 
 
 class ScoreTree(Tree):
-    _score = None
+    _score = 0
     def __init__(self, node, *children:Tree):
         super().__init__(node, tuple(children))
         self._children = tuple([child for child in self if child is not Nil])
@@ -17,9 +17,8 @@ class ScoreTree(Tree):
     def __repr__(self):
         return "Nil" if self.node == None else super().__repr__()
 
-    @property
     def score(self):
-        return 0 if self._score is None else self._score
+        return self._score
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -39,17 +38,16 @@ class Score(ScoreTree):
         super().__init__(score, Nil)
 
     def __str__(self):
-        return str(self.score)
+        return str(self._score)
 
     def __repr__(self):
-        return type(self).__name__ + "(" + repr(self.score) + ")"
+        return type(self).__name__ + "(" + repr(self._score) + ")"
 
 
 class ScoreTerm(ScoreTree):
     def __init__(self, meta, tree:ScoreTree):
         self.meta = meta
         self.tree = tree
-        self._score = tree.score
         super().__init__(tree.node, *tree.children)
 
     def __getitem__(self, index):
@@ -60,3 +58,8 @@ class ScoreTerm(ScoreTree):
 
     def __repr__(self):
         return type(self).__name__ + "(" + repr(self.meta) + ", " + repr(self.tree) + ")"
+
+    @property
+    def _score(self):
+        return self.tree.score()
+
