@@ -1,7 +1,9 @@
 from unittest import TestCase
 from haikuwriters.scoring.oper import Add, Multiply
-from haikuwriters.scoring.tree import ScoreTree, Score, Empty, ScoreTerm
+from haikuwriters.scoring.tree import ScoreTree, Score, Empty, ScoreTerm, MetricData
 
+
+BlankText = MetricData("")
 
 class TestScoreTree(TestCase):
     def test_str_empty(self):
@@ -20,7 +22,7 @@ class TestScoreTree(TestCase):
         self.assertEqual(Empty, ScoreTree(None))
 
     def test_score_empty(self):
-        self.assertEqual(0, Empty.score())
+        self.assertEqual(NotImplemented, Empty.score(BlankText))
 
 
 class TestScore(TestCase):
@@ -42,7 +44,7 @@ class TestScore(TestCase):
         self.assertNotEqual(self.one, self.zero)
 
     def test_score_one(self):
-        self.assertEqual(1, self.one.score())
+        self.assertEqual(1, self.one.score(BlankText))
 
 
 class TestScoreTerm(TestCase):
@@ -88,10 +90,10 @@ class TestScoreTerm(TestCase):
         self.assertNotEqual(Score(1), self.x_empty)
 
     def test_scoreterm_one_score(self):
-        self.assertEqual(1, self.a_one.score())
+        self.assertEqual(1, self.a_one.score(BlankText))
 
     def test_scoreterm_empty_score(self):
-        self.assertEqual(Empty.score(), self.x_empty.score())
+        self.assertEqual(Empty.score(BlankText), self.x_empty.score(BlankText))
 
 
 class TestAlgebraOperations(TestCase):
@@ -117,7 +119,7 @@ class TestAlgebraOperations(TestCase):
         self.assertEqual(self.one_plus_one, self.one_plus_one)
 
     def test_score_add(self):
-        self.assertEqual(2, self.one_plus_one.score())
+        self.assertEqual(2, self.one_plus_one.score(BlankText))
 
     def test_str_multiply(self):
         self.assertEqual("(2 * 2)", str(self.two_times_two))
@@ -126,5 +128,5 @@ class TestAlgebraOperations(TestCase):
         self.assertEqual("Multiply(Score(2), Score(2))", repr(self.two_times_two))
 
     def test_score_multiply(self):
-        self.assertEqual(4, self.two_times_two.score())
+        self.assertEqual(4, self.two_times_two.score(BlankText))
 

@@ -1,5 +1,4 @@
-import random
-from haikuwriters.scoring.tree import ScoreTree
+from haikuwriters.scoring.tree import ScoreTree, MetricData
 
 
 ### Operators ###
@@ -50,9 +49,8 @@ class Combinator(ScoreTree):
     def __repr__(self):
         return type(self).__name__ + "(" + ", ".join(map(repr, self.children)) + ")"
 
-    @property
-    def _score(self):
-        return self.operator.apply(*self.children)
+    def score(self, data:MetricData):
+        return self.operator.apply(data, *self.children)
 
 
 class BinaryOperation(Combinator):
@@ -63,8 +61,8 @@ class BinaryOperation(Combinator):
 
 
 class Add(BinaryOperation):
-    operator = InfixOperator("+", lambda x, y: x.score() + y.score())
+    operator = InfixOperator("+", lambda data, x, y: x.score(data) + y.score(data))
 
 
 class Multiply(BinaryOperation):
-    operator = InfixOperator("*", lambda x, y: x.score() * y.score())
+    operator = InfixOperator("*", lambda data, x, y: x.score(data) * y.score(data))

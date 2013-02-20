@@ -1,8 +1,15 @@
 from nltk.tree import Tree
 
 
+class MetricData:
+    """
+    A container for the ScoreTree to perform metrics on.
+    """
+    def __init__(self, text:str):
+        self.text = text
+
+
 class ScoreTree(Tree):
-    _score = 0
     def __init__(self, node, *children:Tree):
         super().__init__(node, tuple(children))
         self._children = tuple([child for child in self if child is not Empty])
@@ -17,8 +24,8 @@ class ScoreTree(Tree):
     def __repr__(self):
         return "Empty" if self.node == None else super().__repr__()
 
-    def score(self):
-        return self._score
+    def score(self, data:MetricData):
+        return NotImplemented
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -44,6 +51,9 @@ class Score(ScoreTree):
     def __repr__(self):
         return type(self).__name__ + "(" + repr(self._score) + ")"
 
+    def score(self, data:MetricData):
+        return self._score
+
 
 class ScoreTerm(ScoreTree):
     def __init__(self, meta, tree:ScoreTree):
@@ -60,7 +70,6 @@ class ScoreTerm(ScoreTree):
     def __repr__(self):
         return type(self).__name__ + "(" + repr(self.meta) + ", " + repr(self.tree) + ")"
 
-    @property
-    def _score(self):
-        return self.tree.score()
+    def score(self, data:MetricData):
+        return self.tree.score(data)
 
