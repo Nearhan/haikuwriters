@@ -1,5 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.oper import Add, Multiply, Choose
+from haikuwriters.scoring.oper import Add, Multiply
 from haikuwriters.scoring.tree import ScoreTree, Score, Nil, ScoreTerm
 
 
@@ -128,59 +128,3 @@ class TestAlgebraOperations(TestCase):
     def test_score_multiply(self):
         self.assertEqual(4, self.two_times_two.score())
 
-
-class TestChooseOperation(TestCase):
-
-    def setUp(self):
-        self.choose = Choose(
-            ScoreTerm(0.5, Score(-1)),
-            ScoreTerm(0.5, Score(1))
-        )
-        self.nested_choose = Multiply(
-            self.choose,
-            Score(5)
-        )
-
-    def test_str_choose(self):
-        self.assertEqual("(-1 {50%} | 1 {50%})", str(self.choose))
-
-    def test_repr_choose(self):
-        self.assertEqual("Choose(ScoreTerm(0.5, Score(-1)), ScoreTerm(0.5, Score(1)))", repr(self.choose))
-
-
-
-    def test_str_nested_choose(self):
-        self.assertEqual("((-1 {50%} | 1 {50%}) * 5)", str(self.nested_choose))
-
-    def test_repr_nested_choose(self):
-        self.assertEqual(
-            "Multiply(Choose(ScoreTerm(0.5, Score(-1)), ScoreTerm(0.5, Score(1))), Score(5))",
-            repr(self.nested_choose)
-        )
-
-    def test_score_choose(self):
-        passed = False
-        trials = 5
-        trial_counts = []
-        trial_averages = []
-        # Try this test at most 5 times
-        for trial in range(trials):
-            counts = {
-                -1: 0,
-                1: 0,
-            }
-            trial_counts.append(counts)
-            # Grab 100 scores
-            for i in range(100):
-                score = self.choose.score()
-                self.assertIn(score, counts.keys(), "Choose should select either left or right child score.")
-                counts[score] += 1
-                # Get the average count of all the chosen scores
-            avg = float(sum(counts.values()) / len(counts.values()))
-            trial_averages.append(avg)
-            # The number of times the scores are chosen should be approximately equal to the average
-            if all(count < avg + 10 for count in counts.values()):
-                passed = True
-                break
-        self.assertTrue(passed, "Improbable selection of values by Choose operation.  Averages = %s, Counts = %s" %
-                                (trial_averages, trial_counts))

@@ -26,7 +26,8 @@ class ScoreTree(Tree):
         return NotImplemented
 
     def __hash__(self):
-        return hash((vars(self), hash(self.tree)))
+        # Hash all variable name: value pairs along with the hash of all the children
+        return hash((tuple(vars(self).items()), hash(self.children)))
 
 
 Nil = ScoreTree(None)
