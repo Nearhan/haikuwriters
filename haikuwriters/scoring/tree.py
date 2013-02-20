@@ -1,5 +1,7 @@
 from nltk.tree import Tree
 
+class BaseTree(Tree):
+    pass
 
 class MetricData:
     """
@@ -9,8 +11,8 @@ class MetricData:
         self.text = text
 BlankText = MetricData("")
 
-class ScoreTree(Tree):
-    def __init__(self, node, *children:Tree):
+class ScoreTree(BaseTree):
+    def __init__(self, node, *children):
         super().__init__(node, tuple(children))
         self._children = tuple([child for child in self if child is not Empty])
 
