@@ -1,10 +1,10 @@
-from haikuwriters.scoring.tree import ScoreTree, MetricData
+from haikuwriters.scoring.tree import ScoreTree, MetricData, Score
 
 
 ### Operators ###
 
 class Operator:
-    def apply(self, *operands:ScoreTree):
+    def apply(self, data:MetricData, operands:tuple):
         return NotImplemented
 
     def _wrap_str(self, *operands:ScoreTree):
@@ -18,9 +18,7 @@ NoOp = Operator()
 
 
 class InfixOperator(Operator):
-    def __init__(self, symbol:str, apply:callable):
-        self.symbol = symbol
-        self.apply = apply
+    symbol = NotImplemented
 
     def __str__(self):
         return self.symbol
@@ -28,8 +26,28 @@ class InfixOperator(Operator):
     def __repr__(self):
         return self.symbol
 
-    def _wrap_str(self, left:ScoreTree, right:ScoreTree):
-        return str(left) + " " + str(self) + " " + str(right)
+    def _wrap_str(self, *children:ScoreTree):
+        return (" " + str(self) + " ").join(map(str, children))
+
+
+class AddOperator(InfixOperator):
+    symbol = "+"
+    def apply(self, data:MetricData, operands:list):
+        total = 0
+        for op in operands:
+            total += op.score(data)
+        return total
+AddOperator = AddOperator()
+
+
+class MultiplyOperator(InfixOperator):
+    symbol = "*"
+    def apply(self, data:MetricData, operands:list):
+        product = 1
+        for op in operands:
+            product *= op.score(data)
+        return product
+MultiplyOperator = MultiplyOperator()
 
 
 ### Operations ###
@@ -50,19 +68,12 @@ class Combinator(ScoreTree):
         return type(self).__name__ + "(" + ", ".join(map(repr, self.children)) + ")"
 
     def score(self, data:MetricData):
-        return self.operator.apply(data, *self.children)
+        return self.operator.apply(data, self.children)
 
 
-class BinaryOperation(Combinator):
-    def __init__(self, left:ScoreTree, right:ScoreTree):
-        self.left = left
-        self.right = right
-        super().__init__(left, right)
+class Add(Combinator):
+    operator = AddOperator
 
 
-class Add(BinaryOperation):
-    operator = InfixOperator("+", lambda data, x, y: x.score(data) + y.score(data))
-
-
-class Multiply(BinaryOperation):
-    operator = InfixOperator("*", lambda data, x, y: x.score(data) * y.score(data))
+class Multiply(Combinator):
+    operator = MultiplyOperator
