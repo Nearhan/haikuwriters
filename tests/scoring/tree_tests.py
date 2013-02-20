@@ -1,26 +1,26 @@
 from unittest import TestCase
 from haikuwriters.scoring.oper import Add, Multiply
-from haikuwriters.scoring.tree import ScoreTree, Score, Nil, ScoreTerm
+from haikuwriters.scoring.tree import ScoreTree, Score, Empty, ScoreTerm
 
 
 class TestScoreTree(TestCase):
-    def test_str_nil(self):
-        self.assertEqual("Nil", str(Nil))
+    def test_str_empty(self):
+        self.assertEqual("Empty", str(Empty))
 
-    def test_repr_nil(self):
-        self.assertEqual("Nil", repr(Nil))
+    def test_repr_empty(self):
+        self.assertEqual("Empty", repr(Empty))
 
-    def test_str_nil_equals_str_empty(self):
-        self.assertEqual(str(Nil), str(ScoreTree(None)))
+    def test_str_empty_equals_str_none_tree(self):
+        self.assertEqual(str(Empty), str(ScoreTree(None)))
 
-    def test_repr_nil_equals_repr_empty(self):
-        self.assertEqual(repr(Nil), repr(ScoreTree(None)))
+    def test_repr_empty_equals_repr_none_tree(self):
+        self.assertEqual(repr(Empty), repr(ScoreTree(None)))
 
-    def test_equal_empty_and_nil(self):
-        self.assertEqual(Nil, ScoreTree(None))
+    def test_equal_empty_and_none_tree(self):
+        self.assertEqual(Empty, ScoreTree(None))
 
-    def test_score_nil(self):
-        self.assertEqual(0, Nil.score())
+    def test_score_empty(self):
+        self.assertEqual(0, Empty.score())
 
 
 class TestScore(TestCase):
@@ -49,28 +49,28 @@ class TestScoreTerm(TestCase):
 
     def setUp(self):
         self.a_one = ScoreTerm("a", Score(1))
-        self.x_nil = ScoreTerm("x", Nil)
-        self.y_nil = ScoreTerm("y", Nil)
-        self.nest_x = ScoreTerm("nest_x", self.x_nil)
-        self.nest_y = ScoreTerm("nest_y", self.y_nil)
+        self.x_empty = ScoreTerm("x", Empty)
+        self.y_empty = ScoreTerm("y", Empty)
+        self.nest_x = ScoreTerm("nest_x", self.x_empty)
+        self.nest_y = ScoreTerm("nest_y", self.y_empty)
 
-    def test_str_nil(self):
-        self.assertEqual("x@Nil", str(self.x_nil))
+    def test_str_empty(self):
+        self.assertEqual("x@Empty", str(self.x_empty))
 
     def test_str_score(self):
        self.assertEqual("a@1", str(self.a_one))
 
-    def test_repr_nil(self):
-        self.assertEqual("ScoreTerm('x', Nil)", repr(self.x_nil))
+    def test_repr_empty(self):
+        self.assertEqual("ScoreTerm('x', Empty)", repr(self.x_empty))
 
     def test_repr_score(self):
         self.assertEqual("ScoreTerm('a', Score(1))", repr(self.a_one))
 
     def test_equal_scoreterm(self):
-        self.assertEqual(self.x_nil, self.x_nil)
+        self.assertEqual(self.x_empty, self.x_empty)
 
     def test_not_equal_scoreterm(self):
-        self.assertNotEqual(self.x_nil, self.y_nil)
+        self.assertNotEqual(self.x_empty, self.y_empty)
 
     def test_equal_nested_scoreterm(self):
         self.assertEqual(self.nest_x, self.nest_x)
@@ -81,17 +81,17 @@ class TestScoreTerm(TestCase):
     def test_score_one_not_equal_scoreterm_one(self):
         self.assertNotEqual(Score(1), self.a_one)
 
-    def test_score_nil_not_equal_scoreterm_nil(self):
-        self.assertNotEqual(Nil, self.x_nil)
+    def test_score_empty_not_equal_scoreterm_empty(self):
+        self.assertNotEqual(Empty, self.x_empty)
 
-    def test_score_one_not_equal_scoreterm_nil(self):
-        self.assertNotEqual(Score(1), self.x_nil)
+    def test_score_one_not_equal_scoreterm_empty(self):
+        self.assertNotEqual(Score(1), self.x_empty)
 
     def test_scoreterm_one_score(self):
         self.assertEqual(1, self.a_one.score())
 
-    def test_scoreterm_nil_score(self):
-        self.assertEqual(Nil.score(), self.x_nil.score())
+    def test_scoreterm_empty_score(self):
+        self.assertEqual(Empty.score(), self.x_empty.score())
 
 
 class TestAlgebraOperations(TestCase):

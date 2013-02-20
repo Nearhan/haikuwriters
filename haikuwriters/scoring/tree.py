@@ -5,17 +5,17 @@ class ScoreTree(Tree):
     _score = 0
     def __init__(self, node, *children:Tree):
         super().__init__(node, tuple(children))
-        self._children = tuple([child for child in self if child is not Nil])
+        self._children = tuple([child for child in self if child is not Empty])
 
     @property
     def children(self):
         return self._children
 
     def __str__(self):
-        return "Nil" if self.node == None else super().__str__()
+        return "Empty" if self.node == None else super().__str__()
 
     def __repr__(self):
-        return "Nil" if self.node == None else super().__repr__()
+        return "Empty" if self.node == None else super().__repr__()
 
     def score(self):
         return self._score
@@ -30,13 +30,13 @@ class ScoreTree(Tree):
         return hash((tuple(vars(self).items()), hash(self.children)))
 
 
-Nil = ScoreTree(None)
+Empty = ScoreTree(None)
 
 
 class Score(ScoreTree):
     def __init__(self, score:int):
         self._score = score
-        super().__init__(score, Nil)
+        super().__init__(score)
 
     def __str__(self):
         return str(self._score)
