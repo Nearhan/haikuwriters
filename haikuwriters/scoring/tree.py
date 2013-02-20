@@ -7,7 +7,7 @@ class MetricData:
     """
     def __init__(self, text:str):
         self.text = text
-
+BlankText = MetricData("")
 
 class ScoreTree(Tree):
     def __init__(self, node, *children:Tree):
