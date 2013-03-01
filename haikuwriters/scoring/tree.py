@@ -5,6 +5,13 @@ class BaseTree(Tree):
         super().__init__(node, tuple(children))
         self._children = tuple([child for child in self if child is not Empty])
 
+    def __repr__(self):
+        if len(self._children) > 0:
+            children = ", " + ", ".join(map(repr, self._children))
+        else:
+            children = ""
+        return type(self).__name__ + "(" + repr(self.node) + children + ")"
+
 class MetricData:
     """
     A container for the ScoreTree to perform metrics on.
@@ -49,8 +56,8 @@ class Score(ScoreTree):
     def __str__(self):
         return str(self._score)
 
-    def __repr__(self):
-        return type(self).__name__ + "(" + repr(self._score) + ")"
+    # def __repr__(self):
+    #     return type(self).__name__ + "(" + repr(self._score) + ")"
 
     def score(self, data:MetricData):
         return self._score

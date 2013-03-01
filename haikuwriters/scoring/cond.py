@@ -15,6 +15,9 @@ class TrueCond(Cond):
 
     def __str__(self):
         return str(True)
+
+    def __repr__(self):
+        return type(self).__name__
 TrueCond = TrueCond()
 
 
@@ -27,6 +30,9 @@ class FalseCond(Cond):
 
     def __str__(self):
         return str(False)
+
+    def __repr__(self):
+        return type(self).__name__
 FalseCond = FalseCond()
 
 
