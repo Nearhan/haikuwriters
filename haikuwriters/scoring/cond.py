@@ -1,16 +1,16 @@
-from haikuwriters.scoring.tree import BaseTree, ScoreTree
+from haikuwriters.scoring.tree import BaseTree, ScoreTree, MetricData
 
 
-class Cond(BaseTree):
-    def apply(self, *conditions):
+class CondTree(BaseTree):
+    def cond(self, data:MetricData):
         return NotImplemented
 
 
-class TrueCond(Cond):
+class TrueCond(CondTree):
     def __init__(self):
         super().__init__(True)
 
-    def apply(self, *conditions:Cond):
+    def cond(self, data:MetricData):
         return True
 
     def __str__(self):
@@ -21,11 +21,11 @@ class TrueCond(Cond):
 TrueCond = TrueCond()
 
 
-class FalseCond(Cond):
+class FalseCond(CondTree):
     def __init__(self):
         super().__init__(False)
 
-    def apply(self, *conditions:Cond):
+    def cond(self, data:MetricData):
         return False
 
     def __str__(self):
@@ -36,13 +36,8 @@ class FalseCond(Cond):
 FalseCond = FalseCond()
 
 
-class Comparator(BaseTree):
-    def compare(self, *other:Cond):
-        return NotImplemented
-
-
 class IfCond(ScoreTree):
-    def __init__(self, condition:Cond, then:ScoreTree, otherwise:ScoreTree):
+    def __init__(self, condition:CondTree, then:ScoreTree, otherwise:ScoreTree):
         self.condition = condition
         self.then = then
         self.otherwise = otherwise
@@ -54,3 +49,9 @@ class IfCond(ScoreTree):
             true=str(self.then),
             false=str(self.otherwise),
         )
+
+    def score(self, data:MetricData):
+        if self.condition.cond(data) is True:
+            return self.then.score(data)
+        else:
+            return self.otherwise.score(data)
