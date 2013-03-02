@@ -36,6 +36,18 @@ class FalseCond(CondTree):
 FalseCond = FalseCond()
 
 
+class NotCond(CondTree):
+    def __init__(self, condition:CondTree):
+        self.condition = condition
+        super().__init__(condition)
+
+    def __str__(self):
+        return "not " + str(self.condition)
+
+    def cond(self, data:MetricData):
+        return not super().cond(data)
+
+
 class IfCond(ScoreTree):
     def __init__(self, condition:CondTree, then:ScoreTree, otherwise:ScoreTree):
         self.condition = condition
