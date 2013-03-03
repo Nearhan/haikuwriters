@@ -1,4 +1,4 @@
-from haikuwriters.scoring.tree import ScoreTree, MetricData, Score
+from haikuwriters.scoring.tree import ScoreTree, MetricData, BaseTree
 
 
 ### Operators ###
@@ -17,7 +17,7 @@ class Operator:
 NoOp = Operator()
 
 
-class InfixOperator(Operator):
+class BaseOperator(Operator):
     symbol = NotImplemented
 
     def __str__(self):
@@ -26,7 +26,23 @@ class InfixOperator(Operator):
     def __repr__(self):
         return self.symbol
 
-    def _wrap_str(self, *children:ScoreTree):
+    def _wrap_str(self, *children:BaseTree):
+        return NotImplemented
+
+
+class UnaryOperator(BaseOperator):
+    """Used to join multiple operands before applying the operation"""
+    conjunction = ", "
+
+    def _wrap_str(self, *children:BaseTree):
+        if len(children) > 1:
+            return str(self) + " (" + (self.conjunction.join(map(str, children))) + ")"
+        else:
+            return str(self) + " " + str(children[0])
+
+
+class InfixOperator(BaseOperator):
+    def _wrap_str(self, *children:BaseTree):
         return (" " + str(self) + " ").join(map(str, children))
 
 

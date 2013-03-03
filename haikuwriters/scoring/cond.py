@@ -1,3 +1,4 @@
+from haikuwriters.scoring.oper import InfixOperator, UnaryOperator
 from haikuwriters.scoring.tree import BaseTree, ScoreTree, MetricData
 
 
@@ -36,16 +37,9 @@ class FalseCond(CondTree):
 FalseCond = FalseCond()
 
 
-class NotCond(CondTree):
-    def __init__(self, condition:CondTree):
-        self.condition = condition
-        super().__init__(condition)
-
-    def __str__(self):
-        return "not " + str(self.condition)
-
-    def cond(self, data:MetricData):
-        return not super().cond(data)
+class NotOperator(UnaryOperator):
+    symbol = "not"
+    conjunction = "or"
 
 
 class IfCond(ScoreTree):
@@ -67,3 +61,24 @@ class IfCond(ScoreTree):
             return self.then.score(data)
         else:
             return self.otherwise.score(data)
+
+
+class NotCond(ScoreTree):
+   def __init__(self, condition:CondTree):
+       self.condition = condition
+       super().__init__(condition)
+
+   def __str__(self):
+       return "not " + str(self.condition)
+
+   def cond(self, data:MetricData):
+       return False
+
+
+class AndCond(ScoreTree):
+    def __init__(self, *conditions:CondTree):
+        super().__init__(self, )
+        pass
+
+    def __str__(self):
+        return " and "
