@@ -1,10 +1,19 @@
-from haikuwriters.scoring.oper import InfixOperator, UnaryOperator
+from haikuwriters.scoring.oper import UnaryOperator, BaseOperation, Operator
 from haikuwriters.scoring.tree import BaseTree, ScoreTree, MetricData
 
 
 class CondTree(BaseTree):
     def cond(self, data:MetricData):
         return NotImplemented
+
+
+class CondOperation(BaseOperation, CondTree):
+    """
+    An Operation that is also a CondTree
+    """
+    def cond(self, data:MetricData):
+        assert isinstance(self.operator, Operator), "self.operator must be an Operator"
+        return self.operator.apply(data, self.children)
 
 
 class TrueCond(CondTree):
@@ -41,6 +50,11 @@ class NotOperator(UnaryOperator):
     symbol = "not"
     conjunction = "or"
 
+    def apply(self, data:MetricData, operands:list):
+        return False
+        # return not operand or other operands
+NotOperator = NotOperator()
+
 
 class IfCond(ScoreTree):
     def __init__(self, condition:CondTree, then:ScoreTree, otherwise:ScoreTree):
@@ -62,23 +76,13 @@ class IfCond(ScoreTree):
         else:
             return self.otherwise.score(data)
 
-
-class NotCond(ScoreTree):
-   def __init__(self, condition:CondTree):
-       self.condition = condition
-       super().__init__(condition)
-
-   def __str__(self):
-       return "not " + str(self.condition)
-
-   def cond(self, data:MetricData):
-       return False
+    def cond(self, data:MetricData):
+        return self.condition.cond(data)
 
 
-class AndCond(ScoreTree):
-    def __init__(self, *conditions:CondTree):
-        super().__init__(self, )
-        pass
+class Not(CondOperation):
+    operator = NotOperator
 
+    # TODO: Move this to _wrap_str?
     def __str__(self):
-        return " and "
+        return "not " + " or ".join(map(str, self))

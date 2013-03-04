@@ -1,7 +1,8 @@
 from nltk.tree import Tree
 
+
 class BaseTree(Tree):
-    def __init__(self, node, *children):
+    def __init__(self, node, *children:Tree):
         super().__init__(node, tuple(children))
         self._children = tuple([child for child in self if child is not Empty])
 
@@ -12,6 +13,20 @@ class BaseTree(Tree):
             children = ""
         return type(self).__name__ + "(" + repr(self.node) + children + ")"
 
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return vars(self) == vars(other)
+        return NotImplemented
+
+    def __hash__(self):
+        # Hash all variable name: value pairs along with the hash of all the children
+        return hash((tuple(vars(self).items()), hash(self.children)))
+
+    @property
+    def children(self):
+        return self._children
+
+
 class MetricData:
     """
     A container for the ScoreTree to perform metrics on.
@@ -20,11 +35,8 @@ class MetricData:
         self.text = text
 BlankText = MetricData("")
 
-class ScoreTree(BaseTree):
 
-    @property
-    def children(self):
-        return self._children
+class ScoreTree(BaseTree):
 
     def __str__(self):
         return "Empty" if self.node == None else super().__str__()
@@ -34,15 +46,6 @@ class ScoreTree(BaseTree):
 
     def score(self, data:MetricData):
         return NotImplemented
-
-    def __eq__(self, other):
-        if type(other) is type(self):
-            return vars(self) == vars(other)
-        return NotImplemented
-
-    def __hash__(self):
-        # Hash all variable name: value pairs along with the hash of all the children
-        return hash((tuple(vars(self).items()), hash(self.children)))
 
 
 Empty = ScoreTree(None)

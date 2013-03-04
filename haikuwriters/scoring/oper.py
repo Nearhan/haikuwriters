@@ -11,10 +11,7 @@ class Operator:
         return NotImplemented
 
     def __str__(self):
-        return ""
-
-
-NoOp = Operator()
+        return NotImplemented
 
 
 class BaseOperator(Operator):
@@ -25,9 +22,6 @@ class BaseOperator(Operator):
 
     def __repr__(self):
         return self.symbol
-
-    def _wrap_str(self, *children:BaseTree):
-        return NotImplemented
 
 
 class UnaryOperator(BaseOperator):
@@ -68,28 +62,32 @@ MultiplyOperator = MultiplyOperator()
 
 ### Operations ###
 
-class Operation:
-    operator = NoOp
+class BaseOperation(BaseTree):
+    operator = None
 
-
-class Combinator(ScoreTree):
-
-    def __init__(self, *children:ScoreTree):
+    def __init__(self, *children:BaseTree):
         super().__init__(self.operator, *children)
 
     def __str__(self):
-        return "(" + self.operator._wrap_str(*self.children) + ")"
+        return "(" + self.operator._wrap_str(*self) + ")"
 
     def __repr__(self):
-        return type(self).__name__ + "(" + ", ".join(map(repr, self.children)) + ")"
+        return type(self).__name__ + "(" + ", ".join(map(repr, self)) + ")"
+
+
+class ScoreOperation(BaseOperation, ScoreTree):
+    """
+    An Operation that is also a ScoreTree.
+    """
 
     def score(self, data:MetricData):
+        assert isinstance(self.operator, Operator), "self.operator must be an Operator"
         return self.operator.apply(data, self.children)
 
 
-class Add(Combinator):
+class Add(ScoreOperation):
     operator = AddOperator
 
 
-class Multiply(Combinator):
+class Multiply(ScoreOperation):
     operator = MultiplyOperator

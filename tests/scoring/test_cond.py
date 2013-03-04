@@ -1,5 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, NotCond
+from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not
 from haikuwriters.scoring.tree import Score, BlankText
 
 
@@ -7,7 +7,7 @@ class TestIfCond(TestCase):
 
     def setUp(self):
         self.alwaysOne = IfCond(TrueCond, Score(1), Score(0))
-        self.notTrue = NotCond(TrueCond)
+        self.notTrue = Not(TrueCond)
 
     def test_true_str(self):
         self.assertEqual("True", str(TrueCond))
@@ -28,7 +28,7 @@ class TestIfCond(TestCase):
         self.assertEqual("not True", str(self.notTrue))
 
     def test_not_repr(self):
-        self.assertEqual("NotCond(TrueCond)", repr(self.notTrue))
+        self.assertEqual("Not(TrueCond)", repr(self.notTrue))
 
     def test_not_score(self):
         self.assertEqual(False, self.notTrue.cond(BlankText))
