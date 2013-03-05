@@ -62,6 +62,14 @@ class OrOperator(InfixOperator):
 OrOperator = OrOperator()
 
 
+class AndOperator(InfixOperator):
+    symbol = "and"
+
+    def apply(self, data:MetricData, *operands:BaseTree):
+        return all(operand.cond(data) for operand in operands)
+AndOperator = AndOperator()
+
+
 class IfCond(ScoreTree):
     def __init__(self, condition:CondTree, then:ScoreTree, otherwise:ScoreTree):
         self.condition = condition
@@ -89,3 +97,7 @@ class Not(Unary, CondOperation):
 
 class Or(CondOperation):
     operator = OrOperator
+
+
+class And(CondOperation):
+    operator = AndOperator

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not, Or
+from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not, Or, And
 from haikuwriters.scoring.tree import Score, BlankText
 
 
@@ -56,3 +56,22 @@ class TestOrOperation(TestCase):
 
     def test_falseorfalse_cond(self):
         self.assertIs(False, self.falseOrFalse.cond(BlankText))
+
+
+class TestAndOperation(TestCase):
+
+    def setUp(self):
+        self.trueAndTrue = And(TrueCond, TrueCond)
+        self.trueAndFalse = And(TrueCond, FalseCond)
+
+    def test_trueandfalse_str(self):
+        self.assertEqual("(True and False)", str(self.trueAndFalse))
+
+    def test_trueandfalse_repr(self):
+        self.assertEqual("And(TrueCond, FalseCond)", repr(self.trueAndFalse))
+
+    def test_trueandfalse_cond(self):
+        self.assertIs(False, self.trueAndFalse.cond(BlankText))
+
+    def test_trueandtrue_cond(self):
+        self.assertIs(True, self.trueAndTrue.cond(BlankText))
