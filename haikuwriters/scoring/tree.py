@@ -27,6 +27,11 @@ class BaseTree(Tree):
         return self._children
 
 
+class Unary(BaseTree):
+    def __init__(self, child:BaseTree):
+        super().__init__(child)
+
+
 class MetricData:
     """
     A container for the ScoreTree to perform metrics on.

@@ -4,13 +4,10 @@ from haikuwriters.scoring.tree import ScoreTree, MetricData, BaseTree
 ### Operators ###
 
 class Operator:
-    def apply(self, data:MetricData, operands:tuple):
+    def apply(self, data:MetricData, *operands:BaseTree):
         return NotImplemented
 
     def _wrap_str(self, *operands:ScoreTree):
-        return NotImplemented
-
-    def __str__(self):
         return NotImplemented
 
 
@@ -25,14 +22,12 @@ class BaseOperator(Operator):
 
 
 class UnaryOperator(BaseOperator):
-    """Used to join multiple operands before applying the operation"""
-    conjunction = ", "
+    # noinspection PyMethodOverriding
+    def apply(self, data:MetricData, operand:BaseTree):
+        return NotImplemented
 
-    def _wrap_str(self, *children:BaseTree):
-        if len(children) > 1:
-            return str(self) + " (" + (self.conjunction.join(map(str, children))) + ")"
-        else:
-            return str(self) + " " + str(children[0])
+    def _wrap_str(self, operand:BaseTree):
+        return str(self) + " " + str(operand)
 
 
 class InfixOperator(BaseOperator):
@@ -42,7 +37,7 @@ class InfixOperator(BaseOperator):
 
 class AddOperator(InfixOperator):
     symbol = "+"
-    def apply(self, data:MetricData, operands:list):
+    def apply(self, data:MetricData, *operands:BaseTree):
         total = 0
         for op in operands:
             total += op.score(data)
@@ -52,7 +47,7 @@ AddOperator = AddOperator()
 
 class MultiplyOperator(InfixOperator):
     symbol = "*"
-    def apply(self, data:MetricData, operands:list):
+    def apply(self, data:MetricData, *operands:BaseTree):
         product = 1
         for op in operands:
             product *= op.score(data)
@@ -82,7 +77,7 @@ class ScoreOperation(BaseOperation, ScoreTree):
 
     def score(self, data:MetricData):
         assert isinstance(self.operator, Operator), "self.operator must be an Operator"
-        return self.operator.apply(data, self.children)
+        return self.operator.apply(data, *self.children)
 
 
 class Add(ScoreOperation):

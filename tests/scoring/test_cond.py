@@ -25,7 +25,7 @@ class TestIfCond(TestCase):
         self.assertEqual(1, self.alwaysOne.score(BlankText))
 
     def test_not_str(self):
-        self.assertEqual("not True", str(self.notTrue))
+        self.assertEqual("(not True)", str(self.notTrue))
 
     def test_not_repr(self):
         self.assertEqual("Not(TrueCond)", repr(self.notTrue))
