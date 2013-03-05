@@ -1,5 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not
+from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not, Or
 from haikuwriters.scoring.tree import Score, BlankText
 
 
@@ -7,7 +7,6 @@ class TestIfCond(TestCase):
 
     def setUp(self):
         self.alwaysOne = IfCond(TrueCond, Score(1), Score(0))
-        self.notTrue = Not(TrueCond)
 
     def test_true_str(self):
         self.assertEqual("True", str(TrueCond))
@@ -24,11 +23,36 @@ class TestIfCond(TestCase):
     def test_if_score(self):
         self.assertEqual(1, self.alwaysOne.score(BlankText))
 
+
+class TestNotOperation(TestCase):
+
+    def setUp(self):
+        self.notTrue = Not(TrueCond)
+
     def test_not_str(self):
         self.assertEqual("(not True)", str(self.notTrue))
 
     def test_not_repr(self):
         self.assertEqual("Not(TrueCond)", repr(self.notTrue))
 
-    def test_not_score(self):
+    def test_not_cond(self):
         self.assertEqual(False, self.notTrue.cond(BlankText))
+
+
+class TestOrOperation(TestCase):
+
+    def setUp(self):
+        self.trueOrFalse = Or(TrueCond, FalseCond)
+        self.falseOrFalse = Or(FalseCond, FalseCond)
+
+    def test_trueorfalse_str(self):
+        self.assertEqual("(True or False)", str(self.trueOrFalse))
+
+    def test_trueorfalse_repr(self):
+        self.assertEqual("Or(TrueCond, FalseCond)", repr(self.trueOrFalse))
+
+    def test_trueorfalse_cond(self):
+        self.assertIs(True, self.trueOrFalse.cond(BlankText))
+
+    def test_falseorfalse_cond(self):
+        self.assertIs(False, self.falseOrFalse.cond(BlankText))

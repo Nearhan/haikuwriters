@@ -1,4 +1,4 @@
-from haikuwriters.scoring.oper import UnaryOperator, BaseOperation, Operator
+from haikuwriters.scoring.oper import UnaryOperator, BaseOperation, Operator, InfixOperator
 from haikuwriters.scoring.tree import BaseTree, ScoreTree, MetricData, Unary
 
 
@@ -54,6 +54,14 @@ class NotOperator(UnaryOperator):
 NotOperator = NotOperator()
 
 
+class OrOperator(InfixOperator):
+    symbol = "or"
+
+    def apply(self, data:MetricData, *operands:BaseTree):
+        return any(operand.cond(data) for operand in operands)
+OrOperator = OrOperator()
+
+
 class IfCond(ScoreTree):
     def __init__(self, condition:CondTree, then:ScoreTree, otherwise:ScoreTree):
         self.condition = condition
@@ -77,3 +85,7 @@ class IfCond(ScoreTree):
 
 class Not(Unary, CondOperation):
     operator = NotOperator
+
+
+class Or(CondOperation):
+    operator = OrOperator
