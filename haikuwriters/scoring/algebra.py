@@ -1,8 +1,16 @@
-from haikuwriters.scoring.oper import InfixOperation
+from haikuwriters.scoring.oper import InfixOperation, BaseOperation
 from haikuwriters.scoring.tree import ScoreTree, MetricData
 
 
-class Add(InfixOperation, ScoreTree):
+class ScoreOperation(BaseOperation, ScoreTree):
+    """
+    The base class for all operations that are ScoreTrees of ScoreTrees
+    """
+    def __init__(self, *children:ScoreTree):
+        super().__init__(*children)
+
+
+class Add(ScoreOperation, InfixOperation):
     symbol = "+"
 
     def score(self, data:MetricData):
@@ -12,7 +20,7 @@ class Add(InfixOperation, ScoreTree):
         return total
 
 
-class Multiply(InfixOperation, ScoreTree):
+class Multiply(ScoreOperation, InfixOperation):
     symbol = "*"
 
     def score(self, data:MetricData):

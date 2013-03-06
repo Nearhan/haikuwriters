@@ -60,7 +60,7 @@ Empty = ScoreTree(None)
 
 
 class Score(ScoreTree):
-    def __init__(self, score:int):
+    def __init__(self, score:float):
         self._score = score
         super().__init__(score)
 

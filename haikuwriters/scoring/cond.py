@@ -1,10 +1,26 @@
-from haikuwriters.scoring.oper import InfixOperation, UnaryOperation
+from haikuwriters.scoring.oper import InfixOperation, UnaryOperation, BaseOperation
 from haikuwriters.scoring.tree import BaseTree, ScoreTree, MetricData
 
 
 class CondTree(BaseTree):
     def cond(self, data:MetricData):
         return NotImplemented
+
+
+class CondOperation(BaseOperation, CondTree):
+    """
+    The base class for all operations that are CondTrees of CondTrees
+    """
+    def __init__(self, *children:CondTree):
+        super().__init__(*children)
+
+
+class ScoreCondOperation(CondOperation):
+    """
+    The base class for all operations that are CondTrees of ScoreTrees
+    """
+    def __init__(self, *children:ScoreTree):
+        super().__init__(*children)
 
 
 class TrueCond(CondTree):
@@ -58,28 +74,28 @@ class IfCond(ScoreTree):
             return self.otherwise.score(data)
 
 
-class Not(UnaryOperation, CondTree):
+class Not(CondOperation, UnaryOperation):
     symbol = "not"
 
     def cond(self, data:MetricData):
         return not self.child.cond(data)
 
 
-class Or(InfixOperation, CondTree):
+class Or(CondOperation, InfixOperation):
     symbol = "or"
 
     def cond(self, data:MetricData):
         return any(child.cond(data) for child in self.children)
 
 
-class And(InfixOperation, CondTree):
+class And(CondOperation, InfixOperation):
     symbol = "and"
 
     def cond(self, data:MetricData):
         return all(child.cond(data) for child in self.children)
 
 
-class LessThan(InfixOperation, CondTree):
+class LessThan(ScoreCondOperation, InfixOperation):
     symbol = "<"
 
     def __init__(self, left:ScoreTree, right:ScoreTree):
@@ -91,7 +107,7 @@ class LessThan(InfixOperation, CondTree):
         return self.left.score(data) < self.right.score(data)
 
 
-class GreaterThan(InfixOperation, CondTree):
+class GreaterThan(ScoreCondOperation, InfixOperation):
     symbol = ">"
 
     def __init__(self, left:ScoreTree, right:ScoreTree):
