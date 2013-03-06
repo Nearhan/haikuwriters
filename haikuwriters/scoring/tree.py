@@ -29,6 +29,7 @@ class BaseTree(Tree):
 
 class Unary(BaseTree):
     def __init__(self, child:BaseTree):
+        self.child = child
         super().__init__(child)
 
 
@@ -38,6 +39,8 @@ class MetricData:
     """
     def __init__(self, text:str):
         self.text = text
+
+
 BlankText = MetricData("")
 
 

@@ -1,19 +1,10 @@
-from haikuwriters.scoring.oper import UnaryOperator, BaseOperation, Operator, InfixOperator
-from haikuwriters.scoring.tree import BaseTree, ScoreTree, MetricData, Unary
+from haikuwriters.scoring.oper import InfixOperation, UnaryOperation
+from haikuwriters.scoring.tree import BaseTree, ScoreTree, MetricData
 
 
 class CondTree(BaseTree):
     def cond(self, data:MetricData):
         return NotImplemented
-
-
-class CondOperation(BaseOperation, CondTree):
-    """
-    An Operation that is also a CondTree
-    """
-    def cond(self, data:MetricData):
-        assert isinstance(self.operator, Operator), "self.operator must be an Operator"
-        return self.operator.apply(data, *self.children)
 
 
 class TrueCond(CondTree):
@@ -46,30 +37,6 @@ class FalseCond(CondTree):
 FalseCond = FalseCond()
 
 
-class NotOperator(UnaryOperator):
-    symbol = "not"
-
-    def apply(self, data:MetricData, operand:CondTree):
-        return not operand.cond(data)
-NotOperator = NotOperator()
-
-
-class OrOperator(InfixOperator):
-    symbol = "or"
-
-    def apply(self, data:MetricData, *operands:BaseTree):
-        return any(operand.cond(data) for operand in operands)
-OrOperator = OrOperator()
-
-
-class AndOperator(InfixOperator):
-    symbol = "and"
-
-    def apply(self, data:MetricData, *operands:BaseTree):
-        return all(operand.cond(data) for operand in operands)
-AndOperator = AndOperator()
-
-
 class IfCond(ScoreTree):
     def __init__(self, condition:CondTree, then:ScoreTree, otherwise:ScoreTree):
         self.condition = condition
@@ -91,13 +58,22 @@ class IfCond(ScoreTree):
             return self.otherwise.score(data)
 
 
-class Not(Unary, CondOperation):
-    operator = NotOperator
+class Not(UnaryOperation, CondTree):
+    symbol = "not"
+
+    def cond(self, data:MetricData):
+        return not self.child.cond(data)
 
 
-class Or(CondOperation):
-    operator = OrOperator
+class Or(InfixOperation, CondTree):
+    symbol = "or"
+
+    def cond(self, data:MetricData):
+        return any(child.cond(data) for child in self.children)
 
 
-class And(CondOperation):
-    operator = AndOperator
+class And(InfixOperation, CondTree):
+    symbol = "and"
+
+    def cond(self, data:MetricData):
+        return all(child.cond(data) for child in self.children)
