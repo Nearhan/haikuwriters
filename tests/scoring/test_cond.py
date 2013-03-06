@@ -1,5 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not, Or, And, LessThan
+from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not, Or, And, LessThan, GreaterThan
 from haikuwriters.scoring.tree import Score, BlankText
 
 
@@ -94,3 +94,21 @@ class TestLessThanCond(TestCase):
 
     def test_one_less_than_zero_cond(self):
         self.assertIs(False, self.oneLessThanZero.cond(BlankText))
+
+
+class TestGreaterThanCond(TestCase):
+    def setUp(self):
+        self.zeroGreaterThanOne = GreaterThan(Score(0), Score(1))
+        self.oneGreaterThanZero = GreaterThan(Score(1), Score(0))
+
+    def test_zero_less_than_one_str(self):
+        self.assertEqual("(0 > 1)", str(self.zeroGreaterThanOne))
+
+    def test_zero_less_than_one_repr(self):
+        self.assertEqual("GreaterThan(Score(0), Score(1))", repr(self.zeroGreaterThanOne))
+
+    def test_zero_less_than_one_cond(self):
+        self.assertIs(False, self.zeroGreaterThanOne.cond(BlankText))
+
+    def test_one_less_than_zero_cond(self):
+        self.assertIs(True, self.oneGreaterThanZero.cond(BlankText))

@@ -89,3 +89,15 @@ class LessThan(InfixOperation, CondTree):
 
     def cond(self, data:MetricData):
         return self.left.score(data) < self.right.score(data)
+
+
+class GreaterThan(InfixOperation, CondTree):
+    symbol = ">"
+
+    def __init__(self, left:ScoreTree, right:ScoreTree):
+        self.left = left
+        self.right = right
+        super().__init__(left, right)
+
+    def cond(self, data:MetricData):
+        return self.left.score(data) > self.right.score(data)
