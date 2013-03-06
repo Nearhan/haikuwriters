@@ -1,5 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.oper import Add, Multiply
+from haikuwriters.scoring.algebra import Add, Multiply
 from haikuwriters.scoring.tree import BlankText, Score
 
 
