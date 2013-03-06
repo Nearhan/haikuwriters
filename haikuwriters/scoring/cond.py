@@ -77,3 +77,15 @@ class And(InfixOperation, CondTree):
 
     def cond(self, data:MetricData):
         return all(child.cond(data) for child in self.children)
+
+
+class LessThan(InfixOperation, CondTree):
+    symbol = "<"
+
+    def __init__(self, left:ScoreTree, right:ScoreTree):
+        self.left = left
+        self.right = right
+        super().__init__(left, right)
+
+    def cond(self, data:MetricData):
+        return self.left.score(data) < self.right.score(data)

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not, Or, And
+from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not, Or, And, LessThan
 from haikuwriters.scoring.tree import Score, BlankText
 
 
@@ -45,16 +45,16 @@ class TestOrOperation(TestCase):
         self.trueOrFalse = Or(TrueCond, FalseCond)
         self.falseOrFalse = Or(FalseCond, FalseCond)
 
-    def test_trueorfalse_str(self):
+    def test_true_or_false_str(self):
         self.assertEqual("(True or False)", str(self.trueOrFalse))
 
-    def test_trueorfalse_repr(self):
+    def test_true_or_false_repr(self):
         self.assertEqual("Or(TrueCond, FalseCond)", repr(self.trueOrFalse))
 
-    def test_trueorfalse_cond(self):
+    def test_true_or_false_cond(self):
         self.assertIs(True, self.trueOrFalse.cond(BlankText))
 
-    def test_falseorfalse_cond(self):
+    def test_false_or_false_cond(self):
         self.assertIs(False, self.falseOrFalse.cond(BlankText))
 
 
@@ -64,14 +64,33 @@ class TestAndOperation(TestCase):
         self.trueAndTrue = And(TrueCond, TrueCond)
         self.trueAndFalse = And(TrueCond, FalseCond)
 
-    def test_trueandfalse_str(self):
+    def test_true_and_false_str(self):
         self.assertEqual("(True and False)", str(self.trueAndFalse))
 
-    def test_trueandfalse_repr(self):
+    def test_true_and_false_repr(self):
         self.assertEqual("And(TrueCond, FalseCond)", repr(self.trueAndFalse))
 
-    def test_trueandfalse_cond(self):
+    def test_true_and_false_cond(self):
         self.assertIs(False, self.trueAndFalse.cond(BlankText))
 
-    def test_trueandtrue_cond(self):
+    def test_true_and_true_cond(self):
         self.assertIs(True, self.trueAndTrue.cond(BlankText))
+
+
+class TestLessThanCond(TestCase):
+
+    def setUp(self):
+        self.zeroLessThanOne = LessThan(Score(0), Score(1))
+        self.oneLessThanZero = LessThan(Score(1), Score(0))
+
+    def test_zero_less_than_one_str(self):
+        self.assertEqual("(0 < 1)", str(self.zeroLessThanOne))
+
+    def test_zero_less_than_one_repr(self):
+        self.assertEqual("LessThan(Score(0), Score(1))", repr(self.zeroLessThanOne))
+
+    def test_zero_less_than_one_cond(self):
+        self.assertIs(True, self.zeroLessThanOne.cond(BlankText))
+
+    def test_one_less_than_zero_cond(self):
+        self.assertIs(False, self.oneLessThanZero.cond(BlankText))
