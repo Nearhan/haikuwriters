@@ -1,37 +1,6 @@
 from haikuwriters.scoring.tree import ScoreTree, MetricData, BaseTree, Unary
 
 
-### Operators ###
-
-class Operator:
-    def apply(self, data:MetricData, *operands:BaseTree):
-        return NotImplemented
-
-    def _wrap_str(self, *operands:ScoreTree):
-        return NotImplemented
-
-
-class BaseOperator(Operator):
-    symbol = NotImplemented
-
-    def __str__(self):
-        return self.symbol
-
-    def __repr__(self):
-        return self.symbol
-
-
-class UnaryOperator(BaseOperator):
-    # noinspection PyMethodOverriding
-    def apply(self, data:MetricData, operand:BaseTree):
-        return NotImplemented
-
-    def _wrap_str(self, operand:BaseTree):
-        return str(self) + " " + str(operand)
-
-
-### Operations ###
-
 class BaseOperation(BaseTree):
     symbol = NotImplemented
 
