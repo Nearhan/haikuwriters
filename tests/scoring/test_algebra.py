@@ -1,6 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.algebra import Add, Multiply
-from haikuwriters.scoring.tree import BlankText, Score
+from haikuwriters.scoring import *
 
 
 class TestAlgebraOperations(TestCase):

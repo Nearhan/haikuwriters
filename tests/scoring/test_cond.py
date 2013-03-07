@@ -1,6 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.cond import IfCond, TrueCond, FalseCond, Not, Or, And, LessThan, GreaterThan
-from haikuwriters.scoring.tree import Score, BlankText
+from haikuwriters.scoring import *
 
 
 class TestIfCond(TestCase):

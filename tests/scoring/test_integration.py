@@ -1,7 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.algebra import Multiply
-from haikuwriters.scoring.cond import LessThan, Or, IfCond, And, GreaterThan
-from haikuwriters.scoring.tree import Score, BlankText
+from haikuwriters.scoring import *
 
 
 class TestIntegration(TestCase):

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from haikuwriters.scoring.tree import ScoreTree, Score, Empty, ScoreTerm, BlankText
+from haikuwriters.scoring import *
 
 
 class TestScoreTree(TestCase):
