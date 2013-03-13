@@ -1,24 +1,17 @@
 from nltk.tree import Tree
 
 
-class ScoreTree(Tree):
-    _score = 0
+class BaseTree(Tree):
     def __init__(self, node, *children:Tree):
         super().__init__(node, tuple(children))
-        self._children = tuple([child for child in self if child is not Nil])
-
-    @property
-    def children(self):
-        return self._children
-
-    def __str__(self):
-        return "Nil" if self.node == None else super().__str__()
+        self._children = tuple([child for child in self if child is not Empty])
 
     def __repr__(self):
-        return "Nil" if self.node == None else super().__repr__()
-
-    def score(self):
-        return self._score
+        if len(self._children) > 0:
+            children = ", " + ", ".join(map(repr, self._children))
+        else:
+            children = ""
+        return type(self).__name__ + "(" + repr(self.node) + children + ")"
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -26,22 +19,59 @@ class ScoreTree(Tree):
         return NotImplemented
 
     def __hash__(self):
-        return hash((vars(self), hash(self.tree)))
+        # Hash all variable name: value pairs along with the hash of all the children
+        return hash((tuple(vars(self).items()), hash(self.children)))
+
+    @property
+    def children(self):
+        return self._children
 
 
-Nil = ScoreTree(None)
+class Unary(BaseTree):
+    def __init__(self, child:BaseTree):
+        self.child = child
+        super().__init__(child)
+
+
+class MetricData:
+    """
+    A container for the ScoreTree to perform metrics on.
+    """
+    def __init__(self, text:str):
+        self.text = text
+
+
+BlankText = MetricData("")
+
+
+class ScoreTree(BaseTree):
+
+    def __str__(self):
+        return "Empty" if self.node == None else super().__str__()
+
+    def __repr__(self):
+        return "Empty" if self.node == None else super().__repr__()
+
+    def score(self, data:MetricData):
+        return NotImplemented
+
+
+Empty = ScoreTree(None)
 
 
 class Score(ScoreTree):
-    def __init__(self, score:int):
+    def __init__(self, score:float):
         self._score = score
-        super().__init__(score, Nil)
+        super().__init__(score)
 
     def __str__(self):
         return str(self._score)
 
-    def __repr__(self):
-        return type(self).__name__ + "(" + repr(self._score) + ")"
+    # def __repr__(self):
+    #     return type(self).__name__ + "(" + repr(self._score) + ")"
+
+    def score(self, data:MetricData):
+        return self._score
 
 
 class ScoreTerm(ScoreTree):
@@ -59,7 +89,6 @@ class ScoreTerm(ScoreTree):
     def __repr__(self):
         return type(self).__name__ + "(" + repr(self.meta) + ", " + repr(self.tree) + ")"
 
-    @property
-    def _score(self):
-        return self.tree.score()
+    def score(self, data:MetricData):
+        return self.tree.score(data)
 
